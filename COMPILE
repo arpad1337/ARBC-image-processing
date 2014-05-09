@@ -1,0 +1,1 @@
+g++ "-std=c++0x" -ggdb `pkg-config --cflags opencv` -o `basename main.cpp .cpp` main.cpp classes/Preprocessor.cpp classes/Recognizer.cpp classes/Book.cpp `pkg-config --libs opencv tesseract`

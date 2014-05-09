@@ -1,0 +1,12 @@
+main-test.cpp
+main.cpp.bak
+
+# binaries
+main
+arbc.1
+
+_main_backup.cpp
+test-images/
+book-db/
+data-set/
+old_test-images/
