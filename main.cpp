@@ -23,7 +23,7 @@ void recognizing(string filename, vector<uint> ids) {
 
 	Mat image = imread(filename);
 
-	Recognizer* rcg = new Recognizer(0.70f, 0.075f);
+	Recognizer* rcg = new Recognizer(0.70f, 0.065f);
 	Preprocessor* pr = new Preprocessor(image);
     pr->preprocess(10);
 
@@ -78,7 +78,7 @@ void dummyTrain() {
     	Recognizer::storeTrainingSet((uint)(i + 1), Preprocessor::kuwaharaNagaoFilter(image));
     	cout << "#BEGIN-DATA-SET: " + to_string((uint)(i + 1)) << endl;
     	cout << "#BEGIN-CLUSTERVECTOR" << endl;
-		cout << Preprocessor::calculateLAB(40, image) << endl;
+		cout << Preprocessor::calculateLAB(40, image.clone()) << endl;
 		cout << "#END-CLUSTERVECTOR" << endl;
 		cout << "#END-DATA-SET" << endl;
     }
@@ -89,7 +89,7 @@ void storing(uint id, string file) {
 	Recognizer::storeTrainingSet(id, Preprocessor::kuwaharaNagaoFilter(image));
 	cout << "#BEGIN-DATA-SET: " + to_string(id) << endl;
 	cout << "#BEGIN-CLUSTERVECTOR" << endl;
-	cout << Preprocessor::calculateLAB(40, image) << endl;
+	cout << Preprocessor::calculateLAB(40, image.clone()) << endl;
 	cout << "#END-CLUSTERVECTOR" << endl;
 	cout << "#END-DATA-SET" << endl;
 }
@@ -114,10 +114,10 @@ void clustering(string filename) {
     }
 
 	cout << "#BEGIN-CLUSTERVECTOR" << endl;
-	cout << Preprocessor::calculateLAB(40, cover) << endl;
+	cout << Preprocessor::calculateLAB(40, cover.clone()) << endl;
 	cout << "#END-CLUSTERVECTOR" << endl;
 	cout << "#BEGIN-KEYWORDS" << endl;
-	cout << Preprocessor::processOCR(cover);
+	cout << Preprocessor::processOCR(cover.clone());
 	cout << "#END-KEYWORDS" << endl;
 }
 

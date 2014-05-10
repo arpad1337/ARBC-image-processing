@@ -46,6 +46,16 @@ vector<Point2d> Preprocessor::calculateLAB(uint padding, Mat image) {
 string Preprocessor::processOCR(Mat imageMat) {
     string result;
 
+    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(3, 3), Point(1,1) );
+
+    cvtColor( imageMat, imageMat, CV_BGR2GRAY );
+
+    Laplacian(imageMat, imageMat, CV_16S, 3, 1, 0, BORDER_DEFAULT);
+    convertScaleAbs( imageMat, imageMat );
+
+    morphologyEx(imageMat, imageMat, MORPH_CLOSE, element);
+    morphologyEx(imageMat, imageMat, MORPH_OPEN, element);
+
     TessBaseAPI tess;
     
     GenericVector<STRING> pars_vec;
@@ -71,17 +81,17 @@ string Preprocessor::processOCR(Mat imageMat) {
 
     //subtract(wtf,imageMat,imageMat);
 
-    Mat fg;
-    imageMat.convertTo(fg, CV_32F);
-    fg = fg + 1;
-    log(fg, fg);
-    normalize(fg,fg,0,255,NORM_MINMAX);
-    convertScaleAbs(fg,fg);
+    // Mat fg;
+    // imageMat.convertTo(fg, CV_32F);
+    // fg = fg + 1;
+    // log(fg, fg);
+    // normalize(fg,fg,0,255,NORM_MINMAX);
+    // convertScaleAbs(fg,fg);
 
-    tess.Init("", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
+    // tess.Init("", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
 
-    tess.SetImage((uchar*)fg.data, fg.size().width, fg.size().height, fg.channels(), fg.step1());
-    tess.Recognize(0);
+    // tess.SetImage((uchar*)fg.data, fg.size().width, fg.size().height, fg.channels(), fg.step1());
+    // tess.Recognize(0);
 
     return result + tess.GetUTF8Text();
 }

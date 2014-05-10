@@ -50,11 +50,14 @@ bool Recognizer::recognize(Mat warpedCover) {
     vector<double> confidence;
     DMatch m1, m2;
     int maxIndex = 0;
+    int matchesSize = 0;
     long maxCount = 0;
     for(int i = 0; i < books.size(); ++i) {
         matches.clear();
         matcher.knnMatch(books.at(i).Descriptors(), currentDescriptors, matches, 2);
         
+        matchesSize = matches.size() / 2;
+
         good_matches.clear();
         
         for (int j = 0; j < matches.size(); ++j)
@@ -79,7 +82,7 @@ bool Recognizer::recognize(Mat warpedCover) {
         
         cout << books.at(i).Id() << "; matches count: " << good_matches.size() << "\n";
         
-        confidence.push_back((double)good_matches.size() / matches.size());
+        confidence.push_back((double)good_matches.size() / matchesSize);
         
         cout << "Confidence: " << confidence.at(i) * 100 << "% \n";
     }
