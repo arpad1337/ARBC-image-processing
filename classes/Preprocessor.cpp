@@ -44,14 +44,17 @@ vector<Point2d> Preprocessor::calculateLAB(uint padding, Mat image) {
 }
 
 string Preprocessor::processOCR(Mat imageMat) {
-    string result;
 
     Mat element = getStructuringElement(MORPH_ELLIPSE, Size(3, 3), Point(1,1) );
 
-    cvtColor( imageMat, imageMat, CV_BGR2GRAY );
+    //cvtColor( imageMat, imageMat, CV_BGR2GRAY );
 
-    Laplacian(imageMat, imageMat, CV_16S, 3, 1, 0, BORDER_DEFAULT);
-    convertScaleAbs( imageMat, imageMat );
+    //Laplacian(imageMat, imageMat, CV_16S, 3, 1, 0, BORDER_DEFAULT);
+    //convertScaleAbs( imageMat, imageMat );
+
+    // IplImage* toswt = &(IplImage(imageMat[i]));
+
+    // imageMat = Mat(textDetection(toswt, true));
 
     morphologyEx(imageMat, imageMat, MORPH_CLOSE, element);
     morphologyEx(imageMat, imageMat, MORPH_OPEN, element);
@@ -62,20 +65,26 @@ string Preprocessor::processOCR(Mat imageMat) {
     pars_vec.push_back("load_system_dawg");
     pars_vec.push_back("load_freq_dawg");
     pars_vec.push_back("user_words_suffix");
-    pars_vec.push_back("tessedit_char_whitelist");
+   // pars_vec.push_back("user_patterns_suffix");
+    //pars_vec.push_back("tessedit_char_whitelist");
+    //pars_vec.push_back("tessedit_create_hocr");
     
     GenericVector<STRING> pars_values;
-    pars_values.push_back("T");
-    pars_values.push_back("T");
+    pars_values.push_back("F");
+    pars_values.push_back("F");
     pars_values.push_back("user-words");
-    pars_values.push_back("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'");
+   // pars_values.push_back("user-patterns");
+    //pars_values.push_back("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'");
+    //pars_values.push_back("T");
 
-    tess.Init("", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
+    //tess.SetPageSegMode(static_cast<PageSegMode>(7));
+
+    tess.Init("./", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
 
     tess.SetImage((uchar*)imageMat.data, imageMat.size().width, imageMat.size().height, imageMat.channels(), imageMat.step1());
     tess.Recognize(0);
     
-    result = tess.GetUTF8Text();
+    //result = tess.GetUTF8Text();
 
     //Mat wtf = Mat(imageMat.size().height, imageMat.size().width, imageMat.type(), Scalar(255,255,255));
 
@@ -93,7 +102,7 @@ string Preprocessor::processOCR(Mat imageMat) {
     // tess.SetImage((uchar*)fg.data, fg.size().width, fg.size().height, fg.channels(), fg.step1());
     // tess.Recognize(0);
 
-    return result + tess.GetUTF8Text();
+    return tess.GetUTF8Text();
 }
 
 

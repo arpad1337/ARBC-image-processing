@@ -15,6 +15,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
+//#include "TextDetection.h"
 
 using namespace cv;
 using namespace std;

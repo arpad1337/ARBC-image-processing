@@ -94,6 +94,18 @@ void storing(uint id, string file) {
 	cout << "#END-DATA-SET" << endl;
 }
 
+string prependStringToFileName(string p, string s) {
+
+   char sep = '/';
+
+   size_t i = s.rfind(sep, s.length());
+   if (i != string::npos) {
+      return (s.substr(0, i+1)) + p + (s.substr(i+1, s.length() - i));
+   }
+
+   return("");
+}
+
 void clustering(string filename) {
 	Mat image = imread(filename);
 
@@ -111,13 +123,24 @@ void clustering(string filename) {
     	cout << "using the whole image..." << endl;
     } else {
     	cover = pr->WarpedCover();
+    	string nf = prependStringToFileName("to_swt_", filename);
+    	//Mat changeable;
+    	//cover.convertTo(changeable, 1, 30);
+    	imwrite(nf, cover);
+    	cout << "#BEGIN-TO-SWT" << endl;
+    	cout << nf << endl;
+    	cout << "#END-TO-SWT" << endl;
     }
 
 	cout << "#BEGIN-CLUSTERVECTOR" << endl;
-	cout << Preprocessor::calculateLAB(40, cover.clone()) << endl;
+	cout << Preprocessor::calculateLAB(40, cover) << endl;
 	cout << "#END-CLUSTERVECTOR" << endl;
+}
+
+void ocr(string swtFilename) {
+	Mat image = imread(swtFilename);
 	cout << "#BEGIN-KEYWORDS" << endl;
-	cout << Preprocessor::processOCR(cover.clone());
+	cout << Preprocessor::processOCR(image);
 	cout << "#END-KEYWORDS" << endl;
 }
 
@@ -168,6 +191,9 @@ int main( int argc, char** argv )
 
 		cout << "Storing: " << "ID: " + to_string(id) + " :: " << storeable << endl;
 		storing(id, storeable);
+	} else if ( mode == "-ocr" ) { 
+		string processable(argv[2]);
+		ocr(processable);
 	} else if ( mode == "-dummy-train" ) { 
 		dummyTrain();
 	} else if ( mode == "--help" || mode == "-h" ) { 

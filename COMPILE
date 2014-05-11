@@ -1,1 +1,8 @@
+echo "Compiling image-processing module..."
 g++ "-std=c++0x" -ggdb `pkg-config --cflags opencv` -o `basename main.cpp .cpp` main.cpp classes/Preprocessor.cpp classes/Recognizer.cpp classes/Book.cpp `pkg-config --libs opencv tesseract`
+echo "Compiled."
+echo "Compiling SWT module..."
+cd ./swt
+g++ -o DetectText TextDetection.cpp FeaturesMain.cpp -lopencv_core -lopencv_highgui -lopencv_imgproc
+cd ..
+echo "Compiled."
