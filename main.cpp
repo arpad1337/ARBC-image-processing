@@ -198,9 +198,10 @@ int main( int argc, char** argv )
 		dummyTrain();
 	} else if ( mode == "--help" || mode == "-h" ) { 
 		cout << "Usage:" << endl;
-		cout << " -clustering filepath" << endl;
+		cout << " -ocr filepath" << endl;
 		cout << " -recognize filepath [posible-book-id, ...]" << endl;
 		cout << " -store filepath new-id" << endl;
+		cout << " -cluster filepath" << endl;
 	} else {
 		cout << "Error: mode not found." << endl;
 		exit(1);
