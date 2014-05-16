@@ -45,62 +45,24 @@ vector<Point2d> Preprocessor::calculateLAB(uint padding, Mat image) {
 
 string Preprocessor::processOCR(Mat imageMat) {
 
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(3, 3), Point(1,1) );
-
-    //cvtColor( imageMat, imageMat, CV_BGR2GRAY );
-
-    //Laplacian(imageMat, imageMat, CV_16S, 3, 1, 0, BORDER_DEFAULT);
-    //convertScaleAbs( imageMat, imageMat );
-
-    // IplImage* toswt = &(IplImage(imageMat[i]));
-
-    // imageMat = Mat(textDetection(toswt, true));
-
-    morphologyEx(imageMat, imageMat, MORPH_CLOSE, element);
-    morphologyEx(imageMat, imageMat, MORPH_OPEN, element);
-
     TessBaseAPI tess;
     
     GenericVector<STRING> pars_vec;
     pars_vec.push_back("load_system_dawg");
     pars_vec.push_back("load_freq_dawg");
     pars_vec.push_back("user_words_suffix");
-   // pars_vec.push_back("user_patterns_suffix");
-    //pars_vec.push_back("tessedit_char_whitelist");
-    //pars_vec.push_back("tessedit_create_hocr");
+    pars_vec.push_back("tessedit_char_whitelist");
     
     GenericVector<STRING> pars_values;
     pars_values.push_back("F");
     pars_values.push_back("F");
     pars_values.push_back("user-words");
-   // pars_values.push_back("user-patterns");
-    //pars_values.push_back("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'");
-    //pars_values.push_back("T");
+    pars_values.push_back("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'");
 
-    //tess.SetPageSegMode(static_cast<PageSegMode>(7));
-
-    tess.Init("./", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
+    tess.Init("", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
 
     tess.SetImage((uchar*)imageMat.data, imageMat.size().width, imageMat.size().height, imageMat.channels(), imageMat.step1());
     tess.Recognize(0);
-    
-    //result = tess.GetUTF8Text();
-
-    //Mat wtf = Mat(imageMat.size().height, imageMat.size().width, imageMat.type(), Scalar(255,255,255));
-
-    //subtract(wtf,imageMat,imageMat);
-
-    // Mat fg;
-    // imageMat.convertTo(fg, CV_32F);
-    // fg = fg + 1;
-    // log(fg, fg);
-    // normalize(fg,fg,0,255,NORM_MINMAX);
-    // convertScaleAbs(fg,fg);
-
-    // tess.Init("", "eng", OEM_DEFAULT, NULL, 0, &pars_vec, &pars_values, false);
-
-    // tess.SetImage((uchar*)fg.data, fg.size().width, fg.size().height, fg.channels(), fg.step1());
-    // tess.Recognize(0);
 
     return tess.GetUTF8Text();
 }
@@ -112,6 +74,8 @@ void Preprocessor::preprocess(int nthreshold) {
     resize(preprocessableGrey, preprocessableGrey, newSize);
     resize(preprocessable, preprocessable, newSize);
     
+    Mat tmp = Mat::zeros(preprocessableGrey.size().height, preprocessableGrey.size().width, CV_8UC1);
+
     Mat center;
     Scalar meanIntensity, stdDev;
     center = preprocessable(Rect(preprocessable.size().width / 2 - 100,preprocessable.size().height / 2 - 100,200,200)).clone();
@@ -133,15 +97,15 @@ void Preprocessor::preprocess(int nthreshold) {
             }
         }
                 
-        thresh = 6 * thresh;
+        thresh = 5 * thresh;
         
         preprocessableGrey = channels[channelIndex].clone();
 
         medianBlur(preprocessableGrey, preprocessableGrey, 5);
         
-        threshold(preprocessableGrey,preprocessableGrey, meanIntensity[channelIndex], 255, THRESH_BINARY);
+        threshold(preprocessableGrey,tmp, meanIntensity[channelIndex] + (stdDev[channelIndex] / 3), 255, THRESH_BINARY);
     } else {
-        threshold(preprocessableGrey,preprocessableGrey, 50, 255, THRESH_OTSU); 
+        threshold(preprocessableGrey,tmp, 50, 255, THRESH_OTSU); 
     }
     
     SNNEdgeDetection();
@@ -149,6 +113,8 @@ void Preprocessor::preprocess(int nthreshold) {
     morphologyEx(preprocessableGrey, preprocessableGrey, MORPH_CLOSE, element);
     
     HoughLines();
+
+    preprocessableGrey = (-1 * preprocessableGrey + tmp);
 }
 
 void Preprocessor::HoughLines() {

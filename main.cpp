@@ -124,8 +124,6 @@ void clustering(string filename) {
     } else {
     	cover = pr->WarpedCover();
     	string nf = prependStringToFileName("to_swt_", filename);
-    	//Mat changeable;
-    	//cover.convertTo(changeable, 1, 30);
     	imwrite(nf, cover);
     	cout << "#BEGIN-TO-SWT" << endl;
     	cout << nf << endl;
